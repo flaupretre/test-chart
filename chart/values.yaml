@@ -3,7 +3,7 @@ namespace: demo
 
 app:
   name: demo-app
-  replicas: 1
+  replicas: 2
 
 image:
   name: demo
