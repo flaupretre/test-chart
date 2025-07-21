@@ -19,7 +19,7 @@ spec:
       containers:
         #---- PHP FPM ----
         - name: phpfpm
-          image: {{ .Values.image.name }}:{{ .Values.image.tag }}
+          image: {{ .Values.image.php.name }}:{{ .Values.image.php.tag }}
           imagePullPolicy: Never
           securityContext:
             readOnlyRootFilesystem: true
@@ -35,7 +35,7 @@ spec:
 
         #---- Nginx ----
         - name: nginx
-          image: "nginx:latest"
+          image: {{ .Values.image.nginx.name }}:{{ .Values.image.nginx.tag }}
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true

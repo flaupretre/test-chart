@@ -6,5 +6,9 @@ app:
   replicas: 2
 
 image:
-  name: demo
-  tag: 1
+  php:
+    name: demo
+    tag: 1
+  nginx:
+    name: nginx
+    tag: 1.29.0
