@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.app.name }}
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      #============ Containers ============
+      containers:
+        #---- PHP FPM ----
+        - name: phpfpm
+          image: {{ .Values.image.name }}:{{ .Values.image.tag }}
+          imagePullPolicy: Never
+          securityContext:
+            readOnlyRootFilesystem: true
+          ports:
+            - name: fpm
+              containerPort: 9000
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmpdir
+            - mountPath: "/usr/local/etc/php-fpm.conf"
+              name: config-phpfpm
+              subPath: "php-fpm.conf"
+
+        #---- Nginx ----
+        - name: nginx
+          image: "nginx:latest"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
+          ports:
+            - name: http
+              containerPort: 8000
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+          #readinessProbe:
+          #  httpGet:
+          #    path: /healthz.html
+          #    port: http
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmpdir
+            - mountPath: "/etc/nginx/nginx.conf"
+              name: config-nginx
+              subPath: "nginx.conf"
+            - mountPath: "/var/www/static/healthz.html"
+              name: config-nginx
+              subPath: "healthz.html"
+            - mountPath: "/var/cache/nginx"
+              name: nginx-cache
+
+      volumes:
+        - name: tmpdir
+          emptyDir: {}
+        - name: config-nginx
+          configMap:
+            name: "config-nginx"
+        - name: nginx-cache
+          emptyDir: {}
+        - name: config-phpfpm
+          configMap:
+            name: "config-phpfpm"

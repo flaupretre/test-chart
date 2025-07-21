@@ -1,0 +1,9 @@
+
+namespace: demo
+
+app:
+  name: demo-app
+
+image:
+  name: myapp
+  tag: 1
